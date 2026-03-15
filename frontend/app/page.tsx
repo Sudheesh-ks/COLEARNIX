@@ -2,23 +2,15 @@
 
 import { useRef } from "react";
 import './landingpage.css'
-import { useFancyCursor } from "./useFancyCursor";
 import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const trailRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const navigate = useRouter()
 
-  useFancyCursor(cursorRef, trailRef, gridRef);
-
   return (
     <div className="sn-root">
-      <div className="sn-cursor" ref={cursorRef} id="sn-cursor" />
-      <div className="sn-cursor-trail" ref={trailRef} id="sn-cursor-trail" />
-      <div className="sn-noise" />
 
       {/* NAV */}
       <nav className="sn-nav">

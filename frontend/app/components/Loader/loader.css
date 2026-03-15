@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap');
+
+.snl-root {
+  position: fixed;
+  inset: 0;
+  background: #0a0c10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* ── noise ── */
+.snl-root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── ambient glow blobs ── */
+.snl-root::after {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(110, 231, 183, 0.055) 0%,
+    rgba(56, 189, 248, 0.03) 40%,
+    transparent 70%
+  );
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: snl-breathe 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes snl-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.7; }
+  50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 1;   }
+}
+
+/* ── grid lines ── */
+.snl-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 0%, transparent 100%);
+  z-index: 0;
+  animation: snl-grid-fade 3s ease-in-out infinite alternate;
+}
+@keyframes snl-grid-fade {
+  from { opacity: 0.6; }
+  to   { opacity: 1;   }
+}
+
+/* ── card ── */
+.snl-card {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* ── orbit system ── */
+.snl-orbit-wrap {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  margin-bottom: 44px;
+}
+
+/* centre dot */
+.snl-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 12px rgba(110,231,183,0.7), 0 0 28px rgba(110,231,183,0.25);
+  animation: snl-core-pulse 2s ease-in-out infinite;
+}
+@keyframes snl-core-pulse {
+  0%, 100% { transform: translate(-50%,-50%) scale(1);   opacity: 1;   }
+  50%       { transform: translate(-50%,-50%) scale(1.35); opacity: 0.7; }
+}
+
+/* shared orbit ring */
+.snl-orbit {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transform-origin: center;
+}
+
+/* ring 1 */
+.snl-orbit-1 {
+  width: 54px; height: 54px;
+  margin-top: -27px; margin-left: -27px;
+  border-color: rgba(110,231,183,0.2);
+  animation: snl-spin-cw 2.4s linear infinite;
+}
+.snl-orbit-1::after {
+  content: '';
+  position: absolute;
+  width: 7px; height: 7px;
+  background: #6ee7b7;
+  border-radius: 50%;
+  top: -4px; left: 50%; margin-left: -3.5px;
+  box-shadow: 0 0 8px rgba(110,231,183,0.9);
+}
+
+/* ring 2 */
+.snl-orbit-2 {
+  width: 84px; height: 84px;
+  margin-top: -42px; margin-left: -42px;
+  border-color: rgba(56,189,248,0.15);
+  animation: snl-spin-ccw 3.8s linear infinite;
+}
+.snl-orbit-2::after {
+  content: '';
+  position: absolute;
+  width: 6px; height: 6px;
+  background: #38bdf8;
+  border-radius: 50%;
+  bottom: -3px; left: 50%; margin-left: -3px;
+  box-shadow: 0 0 8px rgba(56,189,248,0.9);
+}
+
+/* ring 3 */
+.snl-orbit-3 {
+  width: 110px; height: 110px;
+  margin-top: -55px; margin-left: -55px;
+  border-color: rgba(167,139,250,0.12);
+  animation: snl-spin-cw 6s linear infinite;
+}
+.snl-orbit-3::after {
+  content: '';
+  position: absolute;
+  width: 5px; height: 5px;
+  background: #a78bfa;
+  border-radius: 50%;
+  top: 50%; right: -2.5px; margin-top: -2.5px;
+  box-shadow: 0 0 8px rgba(167,139,250,0.9);
+}
+
+@keyframes snl-spin-cw  { to { transform: rotate(360deg);  } }
+@keyframes snl-spin-ccw { to { transform: rotate(-360deg); } }
+
+/* ── progress bar ── */
+.snl-bar-wrap {
+  width: 160px;
+  height: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.snl-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #6ee7b7, #38bdf8, #a78bfa);
+  background-size: 200% 100%;
+  animation: snl-bar-slide 1.8s ease-in-out infinite, snl-bar-color 3s linear infinite;
+}
+@keyframes snl-bar-slide {
+  0%   { width: 0%;    margin-left: 0%;    }
+  50%  { width: 80%;   margin-left: 0%;    }
+  100% { width: 0%;    margin-left: 100%;  }
+}
+@keyframes snl-bar-color {
+  0%   { background-position: 0%   50%; }
+  100% { background-position: 200% 50%; }
+}

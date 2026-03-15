@@ -1,0 +1,79 @@
+import { Request, Response, NextFunction } from 'express';
+import { HttpStatus } from '../constants/status.constants';
+import { verifyAccessToken } from '../utils/jwt.utils';
+import User from '../models/userModel';
+import Admin from '../models/adminModel';
+
+const authRole = (allowedRoles: Array<'user' | 'admin'>) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(HttpStatus.UNAUTHORIZED).json({
+          success: false,
+          message: 'Authentication failed. Token missing or malformed.',
+        });
+        return;
+      }
+
+      const token = authHeader.split(' ')[1];
+      const decoded = verifyAccessToken(token);
+
+      if (!allowedRoles.includes(decoded.role)) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          success: false,
+          message: 'Access denied. Insufficient permissions.',
+        });
+        return;
+      }
+
+      switch (decoded.role) {
+        case 'user': {
+          const user = await User.findById(decoded.id);
+          if (!user) {
+            res.status(HttpStatus.UNAUTHORIZED).json({
+              success: false,
+              message: 'User not found',
+            });
+            return;
+          }
+
+          if (user.isBlocked) {
+            res.status(HttpStatus.FORBIDDEN).json({
+              success: false,
+              message: 'Your account has been blocked by the admin.',
+            });
+            return;
+          }
+
+          (req as any).userId = user._id;
+          break;
+        }
+
+        case 'admin': {
+          const admin = await Admin.findOne({ email: decoded.email });
+          if (!admin) {
+            res.status(HttpStatus.UNAUTHORIZED).json({
+              success: false,
+              message: 'Admin not found',
+            });
+            return;
+          }
+          (req as any).adminId = admin._id;
+          break;
+        }
+      }
+
+      next();
+    } catch (error: any) {
+      console.log('Role Auth Error:', error.message);
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+    }
+  };
+};
+
+export default authRole;

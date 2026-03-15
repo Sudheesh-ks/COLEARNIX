@@ -8,7 +8,6 @@ export function useFancyCursor(
   gridRef?: RefObject<HTMLDivElement | null>
 ) {
   useEffect(() => {
-    // Hide default cursor
     document.body.style.cursor = "none";
 
     let mx = 0;
@@ -70,7 +69,7 @@ export function useFancyCursor(
 
     reveals.forEach((el) => observer.observe(el));
 
-    // Floating symbols (hero grid)
+    // Floating symbols
     const symbols = ["{}", "//", "<>", "=>", "[]", "&&", "!=", "**"];
     const floatingEls: HTMLDivElement[] = [];
 
