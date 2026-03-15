@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import passport from 'passport';
 import './config/passport';
-import authRouter from './routes/authRote';
+import authRouter from './routes/authRoute';
 dotenv.config();
 
 const app = express();
