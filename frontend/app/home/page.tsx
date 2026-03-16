@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "../services/authService";
 import './home.css'
 import { CreateRoomCard } from "../components/CreateRoomCard";
 
@@ -23,6 +25,37 @@ const NAV_SETTINGS = [
 
 export default function HomePage() {
   const [activeNav, setActiveNav] = useState("home");
+  const router = useRouter();
+
+  useEffect(() => {
+    const verifySession = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        try {
+          const { data } = await authService.refresh();
+          if (data && data.token) {
+            localStorage.setItem("accessToken", data.token);
+          } else {
+            router.replace("/login");
+          }
+        } catch {
+          router.replace("/login");
+        }
+      }
+    };
+    verifySession();
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      localStorage.removeItem("accessToken");
+      router.replace("/login");
+    }
+  };
 
   return (
     <div className="snd-root">
@@ -30,8 +63,8 @@ export default function HomePage() {
       {/* ── SIDEBAR ── */}
       <aside className="snd-sidebar">
         <div className="snd-logo-wrap">
-          <div className="snd-logo-mark">S</div>
-          <span className="snd-logo-text">StudyNest</span>
+          <div className="snd-logo-mark">C</div>
+          <span className="snd-logo-text">Colearnix</span>
         </div>
 
         <div className="snd-sb-section">
@@ -80,7 +113,7 @@ export default function HomePage() {
         {/* TOPBAR */}
         <header className="snd-topbar">
           <div className="snd-breadcrumb">
-            StudyNest
+            Colearnix
             <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 5l7 7-7 7"/></svg>
             <span>Home</span>
           </div>
@@ -96,7 +129,7 @@ export default function HomePage() {
             </div>
 
             {/* Logout */}
-            <div className="snd-logout-btn" title="Sign out">
+            <div className="snd-logout-btn" title="Sign out" onClick={handleLogout} style={{ cursor: "pointer" }}>
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <polyline points="16 17 21 12 16 7"/>

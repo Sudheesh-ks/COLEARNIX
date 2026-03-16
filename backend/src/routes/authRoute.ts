@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from "dotenv";
 import passport from 'passport';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.utils';
+import { userController } from '../dependencyHandlers/user.dependencies';
 dotenv.config();
 
 const authRouter = express.Router();
@@ -38,5 +39,8 @@ authRouter.get(
     res.redirect(`${process.env.GOOGLE_REDIRECT_URL}?token=${accessToken}`);
   }
 );
+
+authRouter.post('/refresh-token', userController.refreshToken.bind(userController));
+authRouter.post('/logout', userController.logout.bind(userController));
 
 export default authRouter;
