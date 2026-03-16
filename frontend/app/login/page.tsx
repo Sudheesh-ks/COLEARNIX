@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   
     useEffect(() => {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("userAccessToken");
       if(accessToken) {
           router.replace("/home");
       }

@@ -9,7 +9,10 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    const isAdminRequest = config.url?.startsWith('/api/admin');
+    const tokenKey = isAdminRequest ? 'adminAccessToken' : 'userAccessToken';
+    const token = typeof window !== 'undefined' ? localStorage.getItem(tokenKey) : null;
+    
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -60,15 +63,19 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
+      const isAdminRequest = originalRequest.url?.startsWith('/api/admin');
+      const refreshUrl = isAdminRequest ? `${backendUrl}/api/admin/refresh-token` : `${backendUrl}/api/auth/refresh-token`;
+      const tokenKey = isAdminRequest ? 'adminAccessToken' : 'userAccessToken';
+
       try {
         const { data } = await axios.post(
-          `${backendUrl}/api/auth/refresh-token`,
+          refreshUrl,
           {},
           { withCredentials: true }
         );
 
         if (data && data.token) {
-          localStorage.setItem('accessToken', data.token);
+          localStorage.setItem(tokenKey, data.token);
           if (originalRequest.headers) {
             originalRequest.headers['Authorization'] = 'Bearer ' + data.token;
           }
@@ -77,9 +84,12 @@ api.interceptors.response.use(
         }
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem('accessToken');
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login';
+        localStorage.removeItem(tokenKey);
+        if (typeof window !== 'undefined') {
+          const isLoginPage = window.location.pathname.includes('/login');
+          if (!isLoginPage) {
+            window.location.href = isAdminRequest ? '/admin/login' : '/login';
+          }
         }
         return Promise.reject(err);
       } finally {

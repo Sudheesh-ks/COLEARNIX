@@ -12,7 +12,7 @@ export default function GoogleCallbackPage() {
     const token = searchParams.get("token");
 
     if (token) {
-      localStorage.setItem("accessToken", token);
+      localStorage.setItem("userAccessToken", token);
       router.replace("/home");
     } else {
       router.replace("/login");

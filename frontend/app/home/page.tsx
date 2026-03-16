@@ -32,12 +32,12 @@ export default function HomePage() {
 
   useEffect(() => {
     const verifySession = async () => {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("userAccessToken");
       if (!accessToken) {
         try {
           const { data } = await authService.refresh();
           if (data && data.token) {
-            localStorage.setItem("accessToken", data.token);
+            localStorage.setItem("userAccessToken", data.token);
           } else {
             router.replace("/login");
           }
@@ -55,7 +55,7 @@ export default function HomePage() {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userAccessToken");
       router.replace("/login");
     }
   };
