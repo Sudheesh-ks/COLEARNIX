@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import './config/passport';
 import authRouter from './routes/authRoute';
+import userRouter from './routes/userRoute';
 dotenv.config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(passport.initialize());
 
 // api endpoints
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 app.get('/', (req,res) => {
     res.send('API is working.........')

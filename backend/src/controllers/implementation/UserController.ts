@@ -55,4 +55,41 @@ export class UserController implements IUserController {
       });
     }
   }
+
+  async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).userId;
+      const profile = await this._userService.getProfile(userId);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: profile
+      });
+    } catch (error: any) {
+      console.error('Get profile error:', error.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || 'Failed to fetch profile'
+      });
+    }
+  }
+
+  async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).userId;
+      const updatedProfile = await this._userService.updateProfile(userId, req.body);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: updatedProfile
+      });
+    } catch (error: any) {
+      console.error('Update profile error:', error.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || 'Failed to update profile'
+      });
+    }
+  }
 }

@@ -32,4 +32,62 @@ export class UserService implements IUserService {
 
     return { token: newAccessToken, refreshToken: newRefreshToken };
   }
+
+  async getProfile(userId: string): Promise<any> {
+    const user = await this._userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const { password, ...userWithoutPassword } = user.toObject();
+    return userWithoutPassword;
+  }
+
+  async updateProfile(userId: string, updateData: any): Promise<any> {
+    const user = await this._userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { name, gender, dob, image } = updateData;
+
+    // Strict Validation
+    if (!name || !gender || !dob) {
+      throw new Error('Name, gender, and date of birth are required');
+    }
+
+    const trimmedName = name.trim().replace(/\s+/g, ' ');
+    if (trimmedName.length < 3) {
+      throw new Error('Name must be at least 3 characters long');
+    }
+    if (trimmedName.length > 50) {
+      throw new Error('Name cannot exceed 50 characters');
+    }
+
+    const birthDate = new Date(dob);
+    const today = new Date();
+    if (birthDate > today) {
+      throw new Error('Date of birth cannot be in the future');
+    }
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 5) {
+      throw new Error('You must be at least 5 years old');
+    }
+
+    const allowedUpdates = {
+      name: trimmedName,
+      gender,
+      dob,
+      ...(image && { image })
+    };
+
+    const updatedUser = await this._userRepository.updateById(userId, allowedUpdates);
+    const { password, ...userWithoutPassword } = updatedUser.toObject();
+    return userWithoutPassword;
+  }
 }

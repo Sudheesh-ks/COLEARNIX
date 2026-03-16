@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "../services/authService";
-import './home.css'
-import { CreateRoomCard } from "../components/CreateRoomCard";
+import '../home/home.css'
+import { ProfileSettings } from "../components/ProfileSettings";
 
 const NAV_MAIN = [
   {
@@ -26,8 +26,7 @@ const NAV_SETTINGS = [
   },
 ];
 
-export default function HomePage() {
-  const [activeNav, setActiveNav] = useState("home");
+export default function ProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
@@ -69,7 +68,7 @@ export default function HomePage() {
 
       {/* ── SIDEBAR ── */}
       <aside className="snd-sidebar">
-        <div className="snd-logo-wrap">
+        <div className="snd-logo-wrap" onClick={() => router.push("/home")} style={{cursor: "pointer"}}>
           <div className="snd-logo-mark">C</div>
           <span className="snd-logo-text">Colearnix</span>
         </div>
@@ -79,7 +78,7 @@ export default function HomePage() {
           {NAV_MAIN.map(item => (
             <div
               key={item.id}
-              className={`snd-nav-item ${activeNav === item.id ? "snd-active" : ""}`}
+              className={`snd-nav-item ${item.id === "home" ? "" : ""}`} // logic for active
               onClick={() => handleNavClick(item.route)}
             >
               <span className="snd-nav-icon">{item.icon}</span>
@@ -93,7 +92,7 @@ export default function HomePage() {
           {NAV_SETTINGS.map(item => (
             <div
               key={item.id}
-              className={`snd-nav-item ${activeNav === item.id ? "snd-active" : ""}`}
+              className={`snd-nav-item ${item.id === "profile" ? "snd-active" : ""}`}
               onClick={() => handleNavClick(item.route)}
             >
               <span className="snd-nav-icon">{item.icon}</span>
@@ -122,7 +121,7 @@ export default function HomePage() {
           <div className="snd-breadcrumb">
             Colearnix
             <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 5l7 7-7 7"/></svg>
-            <span>Home</span>
+            <span>Profile Settings</span>
           </div>
 
           <div className="snd-topbar-right">
@@ -151,7 +150,7 @@ export default function HomePage() {
 
         {/* CONTENT */}
         <div className="snd-content">
-          <CreateRoomCard />
+          <ProfileSettings />
         </div>
 
       </main>
