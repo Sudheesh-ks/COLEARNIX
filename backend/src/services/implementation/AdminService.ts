@@ -1,10 +1,14 @@
 import bcrypt from 'bcryptjs';
 import { IAdminService } from '../interface/IAdminService';
 import { IAdminRepository } from '../../repositories/interface/IAdminRepository';
+import { IUserRepository } from '../../repositories/interface/IUserRepository';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.utils';
 
 export class AdminService implements IAdminService {
-  constructor(private _adminRepository: IAdminRepository) {}
+  constructor(
+    private _adminRepository: IAdminRepository,
+    private _userRepository: IUserRepository
+  ) {}
 
   async login(email: string, password: string): Promise<{ admin: any; accessToken: string; refreshToken: string }> {
     const admin = await this._adminRepository.findByEmail(email);
@@ -48,5 +52,21 @@ export class AdminService implements IAdminService {
     const newRefreshToken = generateRefreshToken(admin._id.toString());
 
     return { token: newAccessToken, refreshToken: newRefreshToken };
+  }
+
+  async getUsers(page: number, limit: number): Promise<{ users: any[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const users = await this._userRepository.findAll(skip, limit);
+    const total = await this._userRepository.countDocuments();
+    return { users, total };
+  }
+
+  async toggleBlockUser(userId: string): Promise<any> {
+    const user = await this._userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedUser = await this._userRepository.updateById(userId, { isBlocked: !user.isBlocked });
+    return updatedUser;
   }
 }

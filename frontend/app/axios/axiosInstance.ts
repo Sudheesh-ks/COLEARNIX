@@ -35,10 +35,24 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+import toast from 'react-hot-toast';
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 403) {
+      const data = error.response.data as any;
+      if (data?.message === 'Your account has been blocked by the admin.') {
+        localStorage.removeItem('userAccessToken');
+        toast.error('admin blocked your account');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+        return Promise.reject(error);
+      }
+    }
 
     if (originalRequest.url?.includes('/refresh-token')) {
       return Promise.reject(error);

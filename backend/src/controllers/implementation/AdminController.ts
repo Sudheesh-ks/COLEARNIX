@@ -4,7 +4,7 @@ import { IAdminService } from '../../services/interface/IAdminService';
 import { HttpStatus } from '../../constants/status.constants';
 
 export class AdminController implements IAdminController {
-  constructor(private _adminService: IAdminService) {}
+  constructor(private _adminService: IAdminService) { }
 
   async login(req: Request, res: Response): Promise<void> {
     try {
@@ -74,6 +74,42 @@ export class AdminController implements IAdminController {
       res.status(HttpStatus.UNAUTHORIZED).json({
         success: false,
         message: error.message || 'Token refresh failed',
+      });
+    }
+  }
+
+  async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { users, total } = await this._adminService.getUsers(page, limit);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: { users, total },
+      });
+    } catch (error: any) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || 'Failed to fetch users',
+      });
+    }
+  }
+
+  async toggleBlockUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params as { userId: string };
+      const updatedUser = await this._adminService.toggleBlockUser(userId);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: `User ${updatedUser.isBlocked ? 'blocked' : 'unblocked'} successfully`,
+        data: updatedUser,
+      });
+    } catch (error: any) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: error.message || 'Failed to toggle user status',
       });
     }
   }

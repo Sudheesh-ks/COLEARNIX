@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react";
-import '../home/home.css';
 
 
 const PAX = [
@@ -24,7 +23,7 @@ export function CreateRoomCard() {
   const [codeCopied, setCodeCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const link  = code ? `Colearnix.app/join/${code.toLowerCase()}` : "";
+  const link  = code ? `studynest.app/join/${code.toLowerCase()}` : "";
   const parts = code.split("-");
 
   const handleGenerate = () => {

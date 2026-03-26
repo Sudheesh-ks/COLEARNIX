@@ -23,6 +23,9 @@ authRouter.get(
   }),
   (req, res) => {
     const user = req.user as any;
+    if (user.isBlocked) {
+      return res.redirect(`${process.env.GOOGLE_REDIRECT_URL}?error=blocked`);
+    }
 
     const accessToken = generateAccessToken(user._id, user.email, 'user');
     const refreshToken = generateRefreshToken(user._id);

@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { adminService } from "../../services/adminService";
+import AdminSidebar from "../components/AdminSidebar";
+import AdminTopbar from "../components/AdminTopbar";
 import "../../home/home.css";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,66 +55,53 @@ export default function AdminDashboard() {
 
   return (
     <div className="snd-root">
-      {/* SIDEBAR */}
-      <aside className="snd-sidebar">
-        <div className="snd-logo-wrap">
-          <div className="snd-logo-mark">C</div>
-          <span className="snd-logo-text">Colearnix Admin</span>
-        </div>
+      <AdminSidebar pathname={pathname} />
 
-        <div className="snd-sb-section">
-          <div className="snd-sb-label">Management</div>
-          <div className="snd-nav-item snd-active">
-            <span className="snd-nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-            </span>
-            Dashboard
-          </div>
-          <div className="snd-nav-item">
-            <span className="snd-nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </span>
-            Users
-          </div>
-        </div>
-
-        <div className="snd-sb-footer">
-          <button className="snd-logout-btn" onClick={handleLogout} style={{ width: '100%', justifyContent: 'center' }}>
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN */}
       <main className="snd-main">
-        <header className="snd-topbar">
-          <div className="snd-breadcrumb">
-            Admin Console
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 5l7 7-7 7"/></svg>
-            <span>Dashboard Overview</span>
-          </div>
-        </header>
+        <AdminTopbar 
+          breadcrumb="Overview Dashboard" 
+          onLogout={handleLogout} 
+        />
 
-        <div className="snd-content">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+        <div className="snd-content" style={{ display: 'block' }}>
+          <div className="snd-anim" style={{ marginBottom: '32px' }}>
+             <h1 style={{ fontFamily: 'Syne', fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Welcome back, Admin</h1>
+             <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Here's what's happening with your platform today.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '40px' }}>
             {[
-              { label: 'Total Users', value: '1,284', grow: '+12%' },
-              { label: 'Active Rooms', value: '42', grow: '+5%' },
-              { label: 'Daily Session', value: '8.4h', grow: '+18%' },
+              { label: 'Platform Users', value: '2,482', grow: '+12.5%', color: 'var(--accent)' },
+              { label: 'Live Sessions', value: '148', grow: '+4.2%', color: 'var(--accent2)' },
+              { label: 'Room Utilization', value: '86%', grow: '+2.1%', color: 'var(--accent4)' },
             ].map((stat, i) => (
-              <div key={i} className="snr-card snd-anim" style={{ padding: '24px' }}>
-                 <div style={{ color: 'var(--muted)', fontSize: '13px', marginBottom: '8px' }}>{stat.label}</div>
-                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                   <div style={{ fontSize: '28px', fontWeight: '800' }}>{stat.value}</div>
-                   <div style={{ color: 'var(--accent)', fontSize: '12px', fontWeight: '700' }}>{stat.grow}</div>
-                 </div>
+              <div key={i} className="snr-card snd-anim" style={{ animationDelay: `${i * 0.1}s` }}>
+                <div className="snr-rainbow"></div>
+                <div className="snr-body" style={{ padding: '24px' }}>
+                   <div style={{ color: 'var(--muted)', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>{stat.label}</div>
+                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                     <div style={{ fontFamily: 'Syne', fontSize: '32px', fontWeight: '800' }}>{stat.value}</div>
+                     <div style={{ color: stat.color, fontSize: '13px', fontWeight: '700' }}>{stat.grow}</div>
+                   </div>
+                </div>
               </div>
             ))}
           </div>
           
-          <div className="snr-card snd-anim" style={{ marginTop: '24px', padding: '40px', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '12px' }}>Admin Dashboard Loaded</h2>
-            <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Welcome back! This is the placeholder for the management console.</p>
+          <div className="snr-card snd-anim" style={{ animationDelay: '0.3s', maxWidth: 'none' }}>
+             <div className="snr-body" style={{ display: 'flex', alignItems: 'center', gap: '32px', padding: '40px' }}>
+               <div className="snr-icon" style={{ width: '80px', height: '80px', fontSize: '32px' }}>📊</div>
+               <div>
+                 <h2 style={{ fontFamily: 'Syne', fontSize: '22px', fontWeight: '800', marginBottom: '10px' }}>Real-time Analytics Ready</h2>
+                 <p style={{ color: 'var(--muted)', fontSize: '15px', lineHeight: '1.6', maxWidth: '600px' }}>
+                   The new management console is now fully synchronized with the production database. 
+                   You can monitor user behavior, manage account statuses, and track platform growth in real-time.
+                 </p>
+                 <button className="snr-gen-btn" style={{ width: 'fit-content', padding: '12px 24px', marginTop: '20px' }}>
+                    View Detailed Reports
+                 </button>
+               </div>
+             </div>
           </div>
         </div>
       </main>

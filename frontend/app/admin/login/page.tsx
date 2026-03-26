@@ -14,8 +14,6 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("adminAccessToken");
-    // For simplicity, we check if token exists. 
-    // Ideally we should verify if it's an admin token.
     if (accessToken) {
       router.replace("/admin/dashboard");
     }
