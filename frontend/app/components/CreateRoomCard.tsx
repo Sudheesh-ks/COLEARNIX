@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { roomService } from "../services/roomService";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const PAX = [
   { n: 2, tag: "duo"   },
@@ -11,25 +13,39 @@ const PAX = [
   { n: 6, tag: "squad" },
 ];
 
-function genCode() {
-  const s = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${s()}-${s()}-${s()}`;
-}
-
 export function CreateRoomCard() {
   const [pax, setPax]           = useState<number | null>(null);
   const [loading, setLoading]   = useState(false);
   const [code, setCode]         = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [link, setLink] = useState("");
+  const router = useRouter();
 
-  const link  = code ? `studynest.app/join/${code.toLowerCase()}` : "";
+  useEffect(() => {
+    if (code) {
+      setLink(`${window.location.origin}/room/${code}`);
+    }
+  }, [code]);
+
   const parts = code.split("-");
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!pax) return;
     setLoading(true);
-    setTimeout(() => { setCode(genCode()); setLoading(false); }, 1100);
+    try {
+      const response = await roomService.createRoom(pax);
+      if (response.data.success) {
+        setCode(response.data.data.roomId);
+      } else {
+        toast.error(response.data.message || "Failed to create room");
+      }
+    } catch (error: any) {
+      console.error("Create room error:", error);
+      toast.error(error.response?.data?.message || "Failed to create room");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const copyCode = () => {
@@ -38,11 +54,17 @@ export function CreateRoomCard() {
     setTimeout(() => setCodeCopied(false), 2000);
   };
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${link}`).catch(() => {});
+    navigator.clipboard.writeText(link).catch(() => {});
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
   };
   const reset = () => { setCode(""); setPax(null); };
+
+  const handleEnterRoom = () => {
+    if (code) {
+      router.push(`/room/${code}`);
+    }
+  };
 
   return (
     <div className="snr-card snd-anim">
@@ -128,7 +150,7 @@ export function CreateRoomCard() {
               <button className="snr-link-copy" onClick={copyLink}>{linkCopied ? "✓" : "Copy"}</button>
             </div>
 
-            <button className="snr-enter-btn">
+            <button className="snr-enter-btn" onClick={handleEnterRoom}>
               Enter Room
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
             </button>
@@ -138,4 +160,4 @@ export function CreateRoomCard() {
       </div>
     </div>
   );
-}
+}
