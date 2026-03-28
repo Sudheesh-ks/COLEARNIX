@@ -6,6 +6,7 @@ import { getSocket } from "../../services/socket";
 import { roomService } from "../../services/roomService";
 import { userService } from "../../services/userService";
 import Loader from "../../components/Loader/Loader";
+import Whiteboard from "../../components/Whiteboard/Whiteboard";
 import toast from "react-hot-toast";
 
 export default function VideoRoom() {
@@ -20,6 +21,7 @@ export default function VideoRoom() {
   const [roomData, setRoomData] = useState<any>(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
   const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({});
   const socket = getSocket();
   const router = useRouter();
@@ -316,6 +318,38 @@ export default function VideoRoom() {
         ))}
       </div>
 
+      {isWhiteboardOpen && (
+        <div className="whiteboard-overlay">
+          <div className="whiteboard-main">
+            <Whiteboard roomId={roomId} socket={socket} />
+          </div>
+          <div className="whiteboard-sidebar">
+            <div className="mini-video-card local">
+               <video
+                 autoPlay
+                 muted
+                 playsInline
+                 ref={(video) => { if (video) video.srcObject = localStream; }}
+               />
+               <div className="mini-label">{userName}</div>
+            </div>
+            {Object.entries(remoteStreams).map(([id, stream]) => (
+              <div key={id} className="mini-video-card">
+                 <video
+                   autoPlay
+                   playsInline
+                   ref={(video) => { if (video) video.srcObject = stream; }}
+                 />
+                 <div className="mini-label">{remoteUsernames[id] || "Student"}</div>
+              </div>
+            ))}
+          </div>
+          <button className="close-whiteboard" onClick={() => setIsWhiteboardOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      )}
+
       <div className="control-bar-wrapper">
         <div className="control-bar">
           <button 
@@ -340,6 +374,16 @@ export default function VideoRoom() {
             ) : (
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             )}
+          </button>
+
+          <button 
+            className={`control-btn ${isWhiteboardOpen ? "active" : ""}`} 
+            onClick={() => setIsWhiteboardOpen(!isWhiteboardOpen)}
+            title={isWhiteboardOpen ? "Close Whiteboard" : "Open Whiteboard"}
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
           </button>
 
           <div className="control-divider" />
@@ -598,6 +642,105 @@ export default function VideoRoom() {
           margin: 0 0.5rem;
         }
         
+        .whiteboard-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.85);
+          backdrop-filter: blur(10px);
+          z-index: 90;
+          display: flex;
+          padding: 1.5rem;
+          padding-bottom: 7rem;
+          gap: 1.5rem;
+        }
+        .whiteboard-main {
+          flex: 1;
+          height: 100%;
+          border-radius: 1.5rem;
+          overflow: hidden;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .whiteboard-sidebar {
+          width: 240px;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          overflow-y: auto;
+          padding-right: 0.5rem;
+        }
+        .whiteboard-sidebar::-webkit-scrollbar { width: 4px; }
+        .whiteboard-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .mini-video-card {
+          width: 100%;
+          aspect-ratio: 16/9;
+          background: var(--surface);
+          border-radius: 0.75rem;
+          overflow: hidden;
+          border: 1px solid var(--border);
+          position: relative;
+        }
+        .mini-video-card video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .mini-label {
+          position: absolute;
+          bottom: 0.5rem;
+          left: 0.5rem;
+          background: rgba(0,0,0,0.5);
+          padding: 0.15rem 0.4rem;
+          border-radius: 0.25rem;
+          font-size: 0.7rem;
+          color: white;
+        }
+        .close-whiteboard {
+          position: absolute;
+          top: 1.5rem;
+          right: 1.5rem;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          z-index: 100;
+        }
+        .close-whiteboard:hover {
+          background: #ef4444;
+          transform: rotate(90deg);
+        }
+        .control-btn.active {
+          background: var(--accent);
+          color: black;
+          box-shadow: 0 0 15px var(--accent);
+        }
+
+        @media (max-width: 1024px) {
+          .whiteboard-overlay {
+            flex-direction: column;
+            padding: 1rem;
+            padding-bottom: 6rem;
+          }
+          .whiteboard-sidebar {
+            width: 100%;
+            height: 120px;
+            flex-direction: row;
+            overflow-x: auto;
+            overflow-y: hidden;
+          }
+          .mini-video-card {
+            width: 180px;
+            flex-shrink: 0;
+          }
+        }
+
         @media (max-width: 768px) {
           .room-container { padding: 0.5rem; }
           .video-grid { padding: 0.5rem; gap: 0.5rem; }

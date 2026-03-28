@@ -1,5 +1,7 @@
 import { Server, Socket } from 'socket.io';
 
+const whiteboardHistory: { [roomId: string]: any[] } = {};
+
 export const setupSocketHandlers = (io: Server) => {
   io.on('connection', (socket: Socket) => {
     console.log('User connected:', socket.id);
@@ -13,6 +15,11 @@ export const setupSocketHandlers = (io: Server) => {
 
       // Notify others in the room
       socket.to(roomId).emit('user-joined', { userId, name, state });
+
+      // Send current whiteboard history to the new user
+      if (whiteboardHistory[roomId]) {
+        socket.emit('whiteboard-history', whiteboardHistory[roomId]);
+      }
     });
 
     socket.on('offer', (data: { roomId: string; offer: any; to: string; from: string; name: string; state: any }) => {
@@ -29,6 +36,20 @@ export const setupSocketHandlers = (io: Server) => {
 
     socket.on('toggle-media', (data: { roomId: string; userId: string; type: 'mic' | 'camera'; enabled: boolean }) => {
       socket.to(data.roomId).emit('toggle-media', data);
+    });
+
+    // Whiteboard events
+    socket.on('whiteboard-draw', (data: { roomId: string; drawData: any }) => {
+      if (!whiteboardHistory[data.roomId]) {
+        whiteboardHistory[data.roomId] = [];
+      }
+      whiteboardHistory[data.roomId].push({ type: 'draw', ...data.drawData });
+      socket.to(data.roomId).emit('whiteboard-draw', data.drawData);
+    });
+
+    socket.on('whiteboard-clear', (roomId: string) => {
+      whiteboardHistory[roomId] = [];
+      socket.to(roomId).emit('whiteboard-clear');
     });
 
     socket.on('disconnecting', () => {
