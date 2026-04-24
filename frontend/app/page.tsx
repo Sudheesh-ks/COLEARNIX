@@ -21,7 +21,7 @@ export default function LandingPage() {
         <ul className="sn-nav-links">
           <li><a href="#sn-features">Features</a></li>
           <li><a href="#sn-how">How it works</a></li>
-          <li><a href="#sn-rooms">Browse Rooms</a></li>
+
           <li><a href="#">Blog</a></li>
         </ul>
         <div className="sn-nav-cta">
@@ -210,88 +210,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ROOMS */}
-      <section className="sn-rooms-section" id="sn-rooms">
-        <div className="sn-reveal">
-          <div className="sn-section-eyebrow">Live right now</div>
-          <h2 className="sn-section-title">Jump into a room.</h2>
-          <p className="sn-section-sub">Hundreds of open study rooms across every subject. Find your people.</p>
-        </div>
-        <div className="sn-rooms-grid">
-          {/* Room 1 */}
-          <div className="sn-room-card sn-reveal" style={{ ["--rc-accent" as string]: "rgba(110,231,183,0.06)" }}>
-            <div className="sn-room-header">
-              <div className="sn-room-icon" style={{ background: "rgba(110,231,183,0.1)" }}>📐</div>
-              <div>
-                <div className="sn-room-name">Calculus Warriors</div>
-                <div className="sn-room-subject">Mathematics · Year 2</div>
-              </div>
-              <div className="sn-room-tag sn-tag-live">● Live</div>
-            </div>
-            <div className="sn-room-meta">
-              <span>👥 5 / 8 members</span>
-              <span>⏱ 1h 24m</span>
-              <span>🌍 Public</span>
-            </div>
-            <div className="sn-room-avatars">
-              <div className="sn-mini-av sn-av1">A</div>
-              <div className="sn-mini-av sn-av2">B</div>
-              <div className="sn-mini-av sn-av3">C</div>
-              <div className="sn-mini-av sn-av4">D</div>
-              <div className="sn-mini-av" style={{ background: "var(--surface2)", borderColor: "var(--border)", color: "var(--muted)", fontSize: 10 }}>+1</div>
-            </div>
-            <button className="sn-room-join">Join Room →</button>
-          </div>
-
-          {/* Room 2 */}
-          <div className="sn-room-card sn-reveal" style={{ ["--rc-accent" as string]: "rgba(56,189,248,0.06)", transitionDelay: "0.1s" }}>
-            <div className="sn-room-header">
-              <div className="sn-room-icon" style={{ background: "rgba(56,189,248,0.1)" }}>⚛️</div>
-              <div>
-                <div className="sn-room-name">React Deep Dive</div>
-                <div className="sn-room-subject">Web Dev · All Levels</div>
-              </div>
-              <div className="sn-room-tag sn-tag-open">Open</div>
-            </div>
-            <div className="sn-room-meta">
-              <span>👥 2 / 10 members</span>
-              <span>⏱ 32m</span>
-              <span>🌍 Public</span>
-            </div>
-            <div className="sn-room-avatars">
-              <div className="sn-mini-av sn-av2">K</div>
-              <div className="sn-mini-av sn-av4">M</div>
-            </div>
-            <button className="sn-room-join">Join Room →</button>
-          </div>
-
-          {/* Room 3 */}
-          <div className="sn-room-card sn-reveal" style={{ ["--rc-accent" as string]: "rgba(244,114,182,0.06)", transitionDelay: "0.2s" }}>
-            <div className="sn-room-header">
-              <div className="sn-room-icon" style={{ background: "rgba(244,114,182,0.1)" }}>🧬</div>
-              <div>
-                <div className="sn-room-name">Bio Finals Prep</div>
-                <div className="sn-room-subject">Biology · Year 3</div>
-              </div>
-              <div className="sn-room-tag sn-tag-full">Full</div>
-            </div>
-            <div className="sn-room-meta">
-              <span>👥 8 / 8 members</span>
-              <span>⏱ 3h 05m</span>
-              <span>🔒 Private</span>
-            </div>
-            <div className="sn-room-avatars">
-              <div className="sn-mini-av sn-av1">S</div>
-              <div className="sn-mini-av sn-av3">T</div>
-              <div className="sn-mini-av sn-av2">U</div>
-              <div className="sn-mini-av sn-av4">V</div>
-              <div className="sn-mini-av" style={{ background: "var(--surface2)", borderColor: "var(--border)", color: "var(--muted)", fontSize: 10 }}>+4</div>
-            </div>
-            <button className="sn-room-join" style={{ opacity: 0.5, pointerEvents: "none" }}>Room Full</button>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="sn-cta-section">
         <h2 className="sn-reveal">
@@ -328,7 +246,7 @@ export default function LandingPage() {
         </div>
         <div className="sn-footer-col">
           <h4>Learn</h4>
-          {["Browse Rooms", "Topics", "Leaderboard", "Blog", "Tutorials"].map(l => <a href="#" key={l}>{l}</a>)}
+          {["Topics", "Leaderboard", "Blog", "Tutorials"].map(l => <a href="#" key={l}>{l}</a>)}
         </div>
         <div className="sn-footer-col">
           <h4>Company</h4>
