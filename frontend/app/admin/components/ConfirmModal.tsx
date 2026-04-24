@@ -12,6 +12,8 @@ interface ConfirmModalProps {
   type?: 'danger' | 'info';
 }
 
+import "./ConfirmModal.css";
+
 export default function ConfirmModal({
   isOpen,
   title,
@@ -26,17 +28,7 @@ export default function ConfirmModal({
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 1000,
-      display: 'grid',
-      placeItems: 'center',
-      padding: '20px',
-      backdropFilter: 'blur(8px)',
-      backgroundColor: 'rgba(0,0,0,0.4)',
-      animation: 'snd-fade-in 0.3s ease-out'
-    }}>
+    <div className="confirm-modal-overlay">
       <div className="snr-card snd-anim" style={{ 
         maxWidth: '400px', 
         width: '100%', 
@@ -95,12 +87,6 @@ export default function ConfirmModal({
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes snd-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }

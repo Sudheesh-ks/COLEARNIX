@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { authUtils } from '../utils/auth';
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -10,8 +11,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const isAdminRequest = config.url?.startsWith('/api/admin');
-    const tokenKey = isAdminRequest ? 'adminAccessToken' : 'userAccessToken';
-    const token = typeof window !== 'undefined' ? localStorage.getItem(tokenKey) : null;
+    const token = authUtils.getToken(isAdminRequest);
     
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -45,7 +45,7 @@ api.interceptors.response.use(
     if (error.response?.status === 403) {
       const data = error.response.data as any;
       if (data?.message === 'Your account has been blocked by the admin.') {
-        localStorage.removeItem('userAccessToken');
+        authUtils.clearSession(false);
         toast.error('admin blocked your account');
         if (typeof window !== 'undefined') {
           window.location.href = '/';
@@ -89,7 +89,7 @@ api.interceptors.response.use(
         );
 
         if (data && data.token) {
-          localStorage.setItem(tokenKey, data.token);
+          authUtils.setToken(data.token, isAdminRequest);
           if (originalRequest.headers) {
             originalRequest.headers['Authorization'] = 'Bearer ' + data.token;
           }
@@ -98,7 +98,7 @@ api.interceptors.response.use(
         }
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem(tokenKey);
+        authUtils.clearSession(isAdminRequest);
         if (typeof window !== 'undefined') {
           const isLoginPage = window.location.pathname.includes('/login');
           if (!isLoginPage) {

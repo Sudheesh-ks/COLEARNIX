@@ -7,6 +7,8 @@ import './home.css'
 import { CreateRoomCard } from "../components/CreateRoomCard";
 import { JoinRoomCard } from "../components/JoinRoomCard";
 
+import { authUtils } from "../utils/auth";
+import { handleApiError } from "../utils/errorHandling";
 import { Sidebar } from "../components/Sidebar";
 import { Topbar } from "../components/Topbar";
 
@@ -16,12 +18,12 @@ export default function HomePage() {
 
   useEffect(() => {
     const verifySession = async () => {
-      const accessToken = localStorage.getItem("userAccessToken");
+      const accessToken = authUtils.getToken();
       if (!accessToken) {
         try {
           const { data } = await authService.refresh();
           if (data && data.token) {
-            localStorage.setItem("userAccessToken", data.token);
+            authUtils.setToken(data.token);
           } else {
             router.replace("/login");
           }
@@ -37,9 +39,9 @@ export default function HomePage() {
     try {
       await authService.logout();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error(handleApiError(error));
     } finally {
-      localStorage.removeItem("userAccessToken");
+      authUtils.clearSession();
       router.replace("/login");
     }
   };

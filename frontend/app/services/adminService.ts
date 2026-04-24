@@ -1,9 +1,10 @@
 import { api } from '../axios/axiosInstance';
+import { ADMIN_API } from '../constants/apiRoutes';
 
 export const adminService = {
-  login: (credentials: any) => api.post('/api/admin/login', credentials),
-  logout: () => api.post('/api/admin/logout'),
-  refresh: () => api.post('/api/admin/refresh-token'),
-  getUsers: (page: number, limit: number) => api.get(`/api/admin/users?page=${page}&limit=${limit}`),
-  toggleBlockUser: (userId: string) => api.patch(`/api/admin/users/${userId}/block`),
+  login: (credentials: any) => api.post(ADMIN_API.LOGIN, credentials),
+  logout: () => api.post(ADMIN_API.LOGOUT),
+  refresh: () => api.post(ADMIN_API.REFRESH_TOKEN),
+  getUsers: (page: number, limit: number) => api.get(ADMIN_API.GET_USERS(page, limit)),
+  toggleBlockUser: (userId: string) => api.patch(ADMIN_API.TOGGLE_BLOCK(userId)),
 };

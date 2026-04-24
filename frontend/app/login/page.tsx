@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import "./login.css";
 import { useRouter } from "next/navigation";
 
+import { AUTH_API } from "../constants/apiRoutes";
+
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 export default function LoginPage() {
@@ -33,7 +35,7 @@ export default function LoginPage() {
         </p>
 
         <button className="google-btn" onClick={() => {
-          window.location.href = `${backendUrl}/api/auth/google`;
+          window.location.href = `${backendUrl}${AUTH_API.GOOGLE}`;
         }}>
           <svg className="google-icon" viewBox="0 0 533.5 544.3">
             <path fill="#4285f4" d="M533.5 278.4c0-18.5-1.5-37-4.7-54.9H272v103.9h146.9c-6.3 34.1-25.1 63-53.4 82.2v68.2h86.4c50.6-46.6 81.6-115.4 81.6-199.4z"/>

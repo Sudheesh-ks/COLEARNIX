@@ -20,6 +20,8 @@ const LANGUAGES = [
   { label: "CSS", value: "css", version: "unknown" },
 ];
 
+import "./CodeEditor.css";
+
 export default function CodeEditor({ roomId, socket }: CodeEditorProps) {
   const [code, setCode] = useState<string>("// Start coding here...\n");
   const [language, setLanguage] = useState<string>("javascript");
@@ -176,147 +178,6 @@ export default function CodeEditor({ roomId, socket }: CodeEditorProps) {
         )}
       </div>
 
-      <style jsx>{`
-        .code-editor-wrapper {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          background: #1e1e1e;
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-        .editor-toolbar {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          padding: 0.75rem 1.5rem;
-          background: #252526;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          z-index: 20;
-        }
-        .tool-group {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-        .tool-label {
-          font-size: 0.65rem;
-          font-weight: 800;
-          color: #858585;
-          letter-spacing: 0.1em;
-        }
-        .language-select {
-          background: #3c3c3c;
-          color: #cccccc;
-          border: 1px solid #454545;
-          padding: 0.35rem 0.75rem;
-          border-radius: 0.25rem;
-          font-size: 0.85rem;
-          outline: none;
-          cursor: pointer;
-        }
-        .run-btn {
-          margin-left: auto;
-          background: #2ea043;
-          color: white;
-          border: none;
-          padding: 0.4rem 1.25rem;
-          border-radius: 0.25rem;
-          font-size: 0.85rem;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          transition: all 0.2s;
-        }
-        .run-btn:hover:not(:disabled) {
-          background: #3fb950;
-          transform: translateY(-1px);
-        }
-        .run-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-        .run-btn.running {
-          background: #ca8a04;
-        }
-        .control-divider {
-          width: 1px;
-          height: 20px;
-          background: rgba(255,255,255,0.1);
-        }
-        .editor-status {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.7rem;
-          font-weight: 600;
-          color: #858585;
-          letter-spacing: 0.5px;
-        }
-        .status-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-        }
-        .status-dot.green {
-          background: #6ee7b7;
-          box-shadow: 0 0 8px #6ee7b7;
-        }
-        .main-editor-layout {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          min-height: 0;
-        }
-        .editor-container {
-          flex: 2;
-          background: #1e1e1e;
-          min-height: 0;
-        }
-        .output-panel {
-          flex: 0.8;
-          background: #000000;
-          border-top: 1px solid rgba(255,255,255,0.05);
-          display: flex;
-          flex-direction: column;
-          min-height: 150px;
-        }
-        .output-header {
-          display: flex;
-          justify-content: space-between;
-          padding: 0.5rem 1.5rem;
-          background: #1e1e1e;
-          font-size: 0.65rem;
-          font-weight: 800;
-          color: #858585;
-          letter-spacing: 0.1em;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .clear-output {
-          background: none;
-          border: none;
-          color: #858585;
-          font-size: 0.65rem;
-          font-weight: 800;
-          cursor: pointer;
-        }
-        .clear-output:hover { color: white; }
-        .output-content {
-          flex: 1;
-          padding: 1rem 1.5rem;
-          color: #cccccc;
-          font-family: 'Fira Code', monospace;
-          font-size: 0.9rem;
-          overflow-y: auto;
-          white-space: pre-wrap;
-          margin: 0;
-        }
-      `}</style>
     </div>
   );
 }
