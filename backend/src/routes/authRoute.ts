@@ -32,8 +32,8 @@ authRouter.get(
 
     res.cookie('refreshToken_user', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
       maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE), // 7 days
     });

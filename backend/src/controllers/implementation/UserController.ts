@@ -14,8 +14,8 @@ export class UserController implements IUserController {
 
       res.cookie('refreshToken_user', refreshToken, {
         httpOnly: true,
-        secure: false, 
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
       });
@@ -38,8 +38,8 @@ export class UserController implements IUserController {
     try {
       res.clearCookie('refreshToken_user', {
         httpOnly: true,
-        secure: false, 
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
       });
 

@@ -13,8 +13,8 @@ export class AdminController implements IAdminController {
 
       res.cookie('refreshToken_admin', refreshToken, {
         httpOnly: true,
-        secure: false, // Set to true in production
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
       });
@@ -36,8 +36,8 @@ export class AdminController implements IAdminController {
     try {
       res.clearCookie('refreshToken_admin', {
         httpOnly: true,
-        secure: false, // Set to true in production
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
       });
 
@@ -60,8 +60,8 @@ export class AdminController implements IAdminController {
 
       res.cookie('refreshToken_admin', newRefreshToken, {
         httpOnly: true,
-        secure: false, // Set to true in production
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
       });
