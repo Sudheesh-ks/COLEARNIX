@@ -1,6 +1,8 @@
 import { IUserService } from '../interface/IUserService';
 import { IUserRepository } from '../../repositories/interface/IUserRepository';
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken } from '../../utils/jwt.utils';
+import { UserDTO } from '../../dtos/user.dto';
+import { toUserDTO } from '../../mappers/userMapper';
 
 export class UserService implements IUserService {
   constructor(private _userRepository: IUserRepository) {}
@@ -33,16 +35,15 @@ export class UserService implements IUserService {
     return { token: newAccessToken, refreshToken: newRefreshToken };
   }
 
-  async getProfile(userId: string): Promise<any> {
+  async getProfile(userId: string): Promise<UserDTO> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }
-    const { password, ...userWithoutPassword } = user.toObject();
-    return userWithoutPassword;
+    return toUserDTO(user);
   }
 
-  async updateProfile(userId: string, updateData: any): Promise<any> {
+  async updateProfile(userId: string, updateData: any): Promise<UserDTO> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new Error('User not found');
@@ -50,7 +51,6 @@ export class UserService implements IUserService {
 
     const { name, gender, dob, image } = updateData;
 
-    // Strict Validation
     if (!name || !gender || !dob) {
       throw new Error('Name, gender, and date of birth are required');
     }
@@ -87,7 +87,9 @@ export class UserService implements IUserService {
     };
 
     const updatedUser = await this._userRepository.updateById(userId, allowedUpdates);
-    const { password, ...userWithoutPassword } = updatedUser.toObject();
-    return userWithoutPassword;
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    return toUserDTO(updatedUser);
   }
 }

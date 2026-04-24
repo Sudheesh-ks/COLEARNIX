@@ -7,6 +7,7 @@ import { roomService } from "../../services/roomService";
 import { userService } from "../../services/userService";
 import Loader from "../../components/Loader/Loader";
 import Whiteboard from "../../components/Whiteboard/Whiteboard";
+import CodeEditor from "../../components/CodeEditor/CodeEditor";
 import toast from "react-hot-toast";
 
 export default function VideoRoom() {
@@ -22,6 +23,7 @@ export default function VideoRoom() {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
+  const [isCodeEditorOpen, setIsCodeEditorOpen] = useState(false);
   const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({});
   const socket = getSocket();
   const router = useRouter();
@@ -319,7 +321,7 @@ export default function VideoRoom() {
       </div>
 
       {isWhiteboardOpen && (
-        <div className="whiteboard-overlay">
+        <div className="whiteboard-overlay transition-all">
           <div className="whiteboard-main">
             <Whiteboard roomId={roomId} socket={socket} />
           </div>
@@ -345,6 +347,38 @@ export default function VideoRoom() {
             ))}
           </div>
           <button className="close-whiteboard" onClick={() => setIsWhiteboardOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      )}
+
+      {isCodeEditorOpen && (
+        <div className="whiteboard-overlay transition-all">
+          <div className="whiteboard-main">
+            <CodeEditor roomId={roomId} socket={socket} />
+          </div>
+          <div className="whiteboard-sidebar">
+            <div className="mini-video-card local">
+               <video
+                 autoPlay
+                 muted
+                 playsInline
+                 ref={(video) => { if (video) video.srcObject = localStream; }}
+               />
+               <div className="mini-label">{userName}</div>
+            </div>
+            {Object.entries(remoteStreams).map(([id, stream]) => (
+              <div key={id} className="mini-video-card">
+                 <video
+                   autoPlay
+                   playsInline
+                   ref={(video) => { if (video) video.srcObject = stream; }}
+                 />
+                 <div className="mini-label">{remoteUsernames[id] || "Student"}</div>
+              </div>
+            ))}
+          </div>
+          <button className="close-whiteboard" onClick={() => setIsCodeEditorOpen(false)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -378,11 +412,27 @@ export default function VideoRoom() {
 
           <button 
             className={`control-btn ${isWhiteboardOpen ? "active" : ""}`} 
-            onClick={() => setIsWhiteboardOpen(!isWhiteboardOpen)}
+            onClick={() => {
+              setIsWhiteboardOpen(!isWhiteboardOpen);
+              setIsCodeEditorOpen(false);
+            }}
             title={isWhiteboardOpen ? "Close Whiteboard" : "Open Whiteboard"}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+
+          <button 
+            className={`control-btn ${isCodeEditorOpen ? "active" : ""}`} 
+            onClick={() => {
+              setIsCodeEditorOpen(!isCodeEditorOpen);
+              setIsWhiteboardOpen(false);
+            }}
+            title={isCodeEditorOpen ? "Close Code Editor" : "Open Code Editor"}
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </button>
 

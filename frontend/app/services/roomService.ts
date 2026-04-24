@@ -12,5 +12,8 @@ export const roomService = {
   },
   leaveRoom: async (roomId: string) => {
     return await api.post(`/api/room/${roomId}/leave`);
+  },
+  executeCode: async (language: string, version: string, code: string) => {
+    return await api.post('/api/room/execute', { language, version, code });
   }
 };

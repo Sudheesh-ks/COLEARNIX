@@ -1,8 +1,9 @@
-import { IRoom } from '../../models/roomModel';
+import { RoomDTO } from "../../dtos/room.dto";
 
 export interface IRoomService {
-  createRoom(hostId: string, pax: number): Promise<IRoom>;
-  getRoom(roomId: string): Promise<IRoom | null>;
-  joinRoom(roomId: string, userId: string): Promise<IRoom>;
+  createRoom(hostId: string, pax: number): Promise<RoomDTO>;
+  getRoom(roomId: string): Promise<RoomDTO | null>;
+  joinRoom(roomId: string, userId: string): Promise<RoomDTO>;
   leaveRoom(roomId: string, userId: string): Promise<void>;
+  executeCode(language: string, version: string, code: string): Promise<any>;
 }

@@ -5,4 +5,5 @@ export interface IRoomController {
   getRoom(req: Request, res: Response): Promise<void>;
   joinRoom(req: Request, res: Response): Promise<void>;
   leaveRoom(req: Request, res: Response): Promise<void>;
+  executeCode(req: Request, res: Response): Promise<void>;
 }

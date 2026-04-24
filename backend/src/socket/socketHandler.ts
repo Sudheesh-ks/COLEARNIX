@@ -1,6 +1,8 @@
 import { Server, Socket } from 'socket.io';
 
 const whiteboardHistory: { [roomId: string]: any[] } = {};
+const codeHistory: { [roomId: string]: string } = {};
+const codeLanguage: { [roomId: string]: string } = {};
 
 export const setupSocketHandlers = (io: Server) => {
   io.on('connection', (socket: Socket) => {
@@ -19,6 +21,14 @@ export const setupSocketHandlers = (io: Server) => {
       // Send current whiteboard history to the new user
       if (whiteboardHistory[roomId]) {
         socket.emit('whiteboard-history', whiteboardHistory[roomId]);
+      }
+
+      // Send current code editor state to the new user
+      if (codeHistory[roomId] !== undefined) {
+        socket.emit('code-history', { 
+          code: codeHistory[roomId], 
+          language: codeLanguage[roomId] || 'javascript' 
+        });
       }
     });
 
@@ -50,6 +60,21 @@ export const setupSocketHandlers = (io: Server) => {
     socket.on('whiteboard-clear', (roomId: string) => {
       whiteboardHistory[roomId] = [];
       socket.to(roomId).emit('whiteboard-clear');
+    });
+
+    // Code Editor events
+    socket.on('code-sync', (data: { roomId: string; code: string }) => {
+      codeHistory[data.roomId] = data.code;
+      socket.to(data.roomId).emit('code-sync', data.code);
+    });
+
+    socket.on('code-language-sync', (data: { roomId: string; language: string }) => {
+      codeLanguage[data.roomId] = data.language;
+      socket.to(data.roomId).emit('code-language-sync', data.language);
+    });
+
+    socket.on('code-output-sync', (data: { roomId: string; output: string }) => {
+      socket.to(data.roomId).emit('code-output-sync', data.output);
     });
 
     socket.on('disconnecting', () => {

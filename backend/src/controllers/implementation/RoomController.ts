@@ -88,4 +88,22 @@ export class RoomController implements IRoomController {
       });
     }
   }
+
+  async executeCode(req: Request, res: Response): Promise<void> {
+    try {
+      const { language, version, code } = req.body;
+      const result = await this._roomService.executeCode(language, version, code);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      console.error('Execute code error:', error.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || 'Execution service unavailable'
+      });
+    }
+  }
 }
