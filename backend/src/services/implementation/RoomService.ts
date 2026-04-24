@@ -92,7 +92,7 @@ export class RoomService implements IRoomService {
         })
       });
 
-      const result = await response.json();
+      const result: any = await response.json();
       
       return {
         run: {
