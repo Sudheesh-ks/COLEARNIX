@@ -1,8 +1,3 @@
-/**
- * Validation Utility
- * Common rules for form inputs
- */
-
 export const validators = {
   isEmail: (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

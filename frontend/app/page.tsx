@@ -253,8 +253,7 @@ export default function LandingPage() {
           {["About", "Careers", "Privacy", "Terms", "Contact"].map(l => <a href="#" key={l}>{l}</a>)}
         </div>
         <div className="sn-footer-bottom">
-          <span>© 2025 Colearnix. All rights reserved.</span>
-          <span>Made with ❤️ for students, by students.</span>
+          <span>© 2026 Colearnix. All rights reserved.</span>
         </div>
       </footer>
     </div>

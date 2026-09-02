@@ -9,7 +9,7 @@ function generateRoomId() {
 }
 
 export class RoomService implements IRoomService {
-  constructor(private readonly _roomRepository: IRoomRepository) {}
+  constructor(private readonly _roomRepository: IRoomRepository) { }
 
   async createRoom(hostId: string, pax: number): Promise<RoomDTO> {
     const roomId = generateRoomId();
@@ -59,11 +59,11 @@ export class RoomService implements IRoomService {
     if (!room) return;
 
     const participants = room.participants.filter(id => id !== userId);
-    
+
     if (participants.length === 0) {
-        await this._roomRepository.updateByRoomId(roomId, { participants, isActive: false });
+      await this._roomRepository.updateByRoomId(roomId, { participants, isActive: false });
     } else {
-        await this._roomRepository.updateByRoomId(roomId, { participants });
+      await this._roomRepository.updateByRoomId(roomId, { participants });
     }
   }
 
@@ -93,7 +93,7 @@ export class RoomService implements IRoomService {
       });
 
       const result: any = await response.json();
-      
+
       return {
         run: {
           stdout: result.stdout,

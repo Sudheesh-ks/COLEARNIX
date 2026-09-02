@@ -12,18 +12,12 @@ export const setupSocketHandlers = (io: Server) => {
       socket.join(roomId);
       console.log(`User ${userId} (${name}) joined room ${roomId}`);
       
-      // Store user info on the socket
       (socket as any).userId = userId;
 
-      // Notify others in the room
       socket.to(roomId).emit('user-joined', { userId, name, state });
-
-      // Send current whiteboard history to the new user
       if (whiteboardHistory[roomId]) {
         socket.emit('whiteboard-history', whiteboardHistory[roomId]);
       }
-
-      // Send current code editor state to the new user
       if (codeHistory[roomId] !== undefined) {
         socket.emit('code-history', { 
           code: codeHistory[roomId], 

@@ -1,8 +1,3 @@
-/**
- * Unified Storage Utility
- * Handles localStorage with safe parsing and stringifying
- */
-
 export const storage = {
   get: <T>(key: string): T | null => {
     if (typeof window === 'undefined') return null;

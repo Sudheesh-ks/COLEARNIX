@@ -9,7 +9,7 @@ export class RoomController implements IRoomController {
   async createRoom(req: Request, res: Response): Promise<void> {
     try {
       const { pax } = req.body;
-      const hostId = (req as any).userId; // Assumes authMiddleware sets this
+      const hostId = (req as any).userId;
       const room = await this._roomService.createRoom(hostId, pax);
 
       res.status(HttpStatus.OK).json({
