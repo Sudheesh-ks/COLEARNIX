@@ -9,7 +9,7 @@ export class RoomController implements IRoomController {
   async createRoom(req: Request, res: Response): Promise<void> {
     try {
       const { pax } = req.body;
-      const hostId = (req as any).userId; // Assumes authMiddleware sets this
+      const hostId = (req as any).userId.toString();
       const room = await this._roomService.createRoom(hostId, pax);
 
       res.status(HttpStatus.OK).json({
@@ -54,7 +54,7 @@ export class RoomController implements IRoomController {
   async joinRoom(req: Request, res: Response): Promise<void> {
     try {
       const { roomId } = req.params as { roomId: string };
-      const userId = (req as any).userId;
+      const userId = (req as any).userId.toString();
       const room = await this._roomService.joinRoom(roomId, userId);
 
       res.status(HttpStatus.OK).json({
@@ -70,10 +70,37 @@ export class RoomController implements IRoomController {
     }
   }
 
+  async checkAccess(req: Request, res: Response): Promise<void> {
+    try {
+      const { roomId } = req.params as { roomId: string };
+      const userId = (req as any).userId.toString();
+      const room = await this._roomService.getRoomForParticipant(roomId, userId);
+
+      if (!room) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          success: false,
+          message: 'Enter the code to join the room'
+        });
+        return;
+      }
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: room
+      });
+    } catch (error: any) {
+      console.error('Room access check error:', error.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to verify room access'
+      });
+    }
+  }
+
   async leaveRoom(req: Request, res: Response): Promise<void> {
     try {
       const { roomId } = req.params as { roomId: string };
-      const userId = (req as any).userId;
+      const userId = (req as any).userId.toString();
       await this._roomService.leaveRoom(roomId, userId);
 
       res.status(HttpStatus.OK).json({

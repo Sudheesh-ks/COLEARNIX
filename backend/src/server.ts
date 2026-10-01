@@ -12,6 +12,7 @@ import roomRouter from './routes/roomRoute';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupSocketHandlers } from './socket/socketHandler';
+import { roomService } from './dependencyHandlers/room.dependencies';
 
 dotenv.config();
 
@@ -47,8 +48,8 @@ app.get('/', (req,res) => {
     res.send('API is working.........')
 })
 
-setupSocketHandlers(io);
+setupSocketHandlers(io, roomService);
 
 httpServer.listen(PORT, () => {
     console.log(`server started at ${PORT}`)
-})
+})

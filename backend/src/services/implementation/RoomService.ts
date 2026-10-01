@@ -54,6 +54,20 @@ export class RoomService implements IRoomService {
     return toRoomDTO(updatedRoom);
   }
 
+  async getRoomForParticipant(roomId: string, userId: string): Promise<RoomDTO | null> {
+    const room = await this._roomRepository.findByRoomId(roomId);
+    if (!room || !room.participants.includes(userId)) {
+      return null;
+    }
+
+    return toRoomDTO(room);
+  }
+
+  async isActiveParticipant(roomId: string, userId: string): Promise<boolean> {
+    const room = await this._roomRepository.findByRoomId(roomId);
+    return !!room?.participants.includes(userId);
+  }
+
   async leaveRoom(roomId: string, userId: string): Promise<void> {
     const room = await this._roomRepository.findByRoomId(roomId);
     if (!room) return;
@@ -92,7 +106,13 @@ export class RoomService implements IRoomService {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json() as {
+        stdout?: string;
+        stderr?: string;
+        compile_output?: string;
+        message?: string;
+        status?: { id?: number };
+      };
       
       return {
         run: {

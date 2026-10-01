@@ -10,6 +10,9 @@ export const roomService = {
   joinRoom: async (roomId: string) => {
     return await api.post(`/api/room/${roomId}/join`);
   },
+  checkAccess: async (roomId: string) => {
+    return await api.get(`/api/room/${roomId}/access`);
+  },
   leaveRoom: async (roomId: string) => {
     return await api.post(`/api/room/${roomId}/leave`);
   },
