@@ -11,6 +11,9 @@ export const roomService = {
   joinRoom: async (roomId: string) => {
     return await api.post(ROOM_API.JOIN(roomId));
   },
+  checkAccess: async (roomId: string) => {
+    return await api.get(`/api/room/${roomId}/access`);
+  },
   leaveRoom: async (roomId: string) => {
     return await api.post(ROOM_API.LEAVE(roomId));
   },

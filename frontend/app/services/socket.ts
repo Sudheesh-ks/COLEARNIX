@@ -6,11 +6,17 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000
 let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('userAccessToken') : null;
+
   if (!socket) {
     socket = io(backendUrl, {
       withCredentials: true,
       autoConnect: false,
+      auth: { token },
     });
+  } else {
+    socket.auth = { token };
   }
+
   return socket;
 };

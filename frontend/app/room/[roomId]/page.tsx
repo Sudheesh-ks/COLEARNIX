@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
 import { getSocket } from "../../services/socket";
 import { roomService } from "../../services/roomService";
 import { userService } from "../../services/userService";
@@ -26,7 +27,10 @@ export default function VideoRoom() {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
   const [isCodeEditorOpen, setIsCodeEditorOpen] = useState(false);
+  const [isEndingCall, setIsEndingCall] = useState(false);
   const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({});
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const isEndingCallRef = useRef(false);
   const socket = getSocket();
   const router = useRouter();
 
@@ -35,32 +39,39 @@ export default function VideoRoom() {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
+    const handleRoomError = (message: string) => {
+      toast.error(message || "You no longer have access to this room");
+      socket.disconnect();
+      router.replace("/home");
+    };
+
     const init = async () => {
       try {
-        // 1. Get user profile
         const profileResp = await userService.getProfile();
         const currentUserId = profileResp.data.data._id;
         const currentName = profileResp.data.data.name || "Student";
+        if (cancelled) return;
+
+        const accessResp = await roomService.checkAccess(roomId);
+        if (cancelled) return;
         setUserId(currentUserId);
         setUserName(currentName);
+        setRoomData(accessResp.data.data);
 
-        // 2. Join room in backend (check pax)
-        const joinResp = await roomService.joinRoom(roomId);
-        if (!joinResp.data.success) {
-          toast.error(joinResp.data.message || "Failed to join room");
-          router.push("/home");
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (cancelled) {
+          stream.getTracks().forEach(track => track.stop());
           return;
         }
-        setRoomData(joinResp.data.data);
-
-        // 3. Get local media
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStreamRef.current = stream;
         setLocalStream(stream);
 
-        // 4. Connect socket
         const initialState = { mic: isMicOn, camera: isCameraOn };
+        socket.auth = { token: localStorage.getItem("userAccessToken") };
         socket.connect();
-        socket.emit("join-room", roomId, currentUserId, currentName, initialState);
+        socket.emit("join-room", roomId, initialState);
 
         socket.on("user-joined", (data: { userId: string, name: string, state: any }) => {
           console.log("User joined:", data.userId, data.name, data.state);
@@ -126,11 +137,16 @@ export default function VideoRoom() {
             return next;
           });
         });
+        socket.on("room-error", handleRoomError);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
+        if (cancelled) return;
+        const message = axios.isAxiosError<{ message?: string }>(error)
+          ? error.response?.data?.message
+          : undefined;
         console.error("Room init error:", error);
-        toast.error("Failed to join video room: " + (error.response?.data?.message || "Check your camera permissions"));
-        router.push("/home");
+        toast.error(message || "Failed to enter the room. Check your camera permissions.");
+        router.replace("/home");
       }
     };
 
@@ -143,10 +159,13 @@ export default function VideoRoom() {
       socket.off("ice-candidate");
       socket.off("toggle-media");
       socket.off("user-left");
+      socket.off("room-error", handleRoomError);
       socket.disconnect();
-      localStream?.getTracks().forEach(track => track.stop());
+      cancelled = true;
+      localStreamRef.current?.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
       Object.values(peerConnections.current).forEach(pc => pc.close());
-      roomService.leaveRoom(roomId).catch(console.error);
+      peerConnections.current = {};
     };
   }, [roomId]);
 
@@ -236,6 +255,29 @@ export default function VideoRoom() {
       });
       setIsCameraOn(newState);
       socket.emit('toggle-media', { roomId, userId, type: 'camera', enabled: newState });
+    }
+  };
+
+  const endCall = async () => {
+    if (isEndingCallRef.current) return;
+    isEndingCallRef.current = true;
+    setIsEndingCall(true);
+
+    try {
+      await roomService.leaveRoom(roomId);
+      localStreamRef.current?.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
+      Object.values(peerConnections.current).forEach(pc => pc.close());
+      peerConnections.current = {};
+      socket.disconnect();
+      router.replace("/home");
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message
+        : undefined;
+      toast.error(message || "Could not leave the room. Please try again.");
+      isEndingCallRef.current = false;
+      setIsEndingCall(false);
     }
   };
 
@@ -440,7 +482,7 @@ export default function VideoRoom() {
 
           <div className="control-divider" />
 
-          <button className="control-btn hangup" onClick={() => router.push("/home")}>
+          <button className="control-btn hangup" onClick={endCall} disabled={isEndingCall} title="End call" aria-label="End call">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.09-.34.14-.52.14s-.36-.05-.52-.14l-7.9-4.44c-.32-.17-.53-.5-.53-.88v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.09.34-.14.52-.14s.36.05.52.14l7.9 4.44c.32.17.53.5.53.88v9z"/></svg>
           </button>
         </div>
